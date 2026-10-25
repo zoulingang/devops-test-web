@@ -44,13 +44,15 @@ npm test
 CI 流程写在 Dagger 模块里，本地和 GitHub Actions 跑的是同一条命令：
 
 ```bash
-dagger call lint   # 静态检查：eslint
-dagger call test   # 单元测试：npm test
+dagger call lint        # 静态检查：eslint
+dagger call test        # 单元测试：npm test
+dagger call end-to-end  # 端到端（E2E）测试：启动后端 + 前端，用 Playwright 在浏览器里增、改、删一个客户
 ```
 
 - `dagger.json`：模块声明（名字、Dagger 版本、用 Python SDK、代码在 `.dagger/`）
-- `.dagger/src/devops_test_web/main.py`：两个函数。`lint` 在 `node:22-slim` 容器里 `npm ci` 后运行 `npm run lint`（规则见 `eslint.config.js`）；`test` 运行 `npm test`（单元测试不依赖 npm 包，所以不需要 install）
-- `.github/workflows/ci.yml`：在 PR 和 push 到 main 时先运行 `dagger call lint`，再运行 `dagger call test`
+- `.dagger/src/devops_test_web/main.py`：三个函数。`lint` 在 `node:22-slim` 容器里 `npm ci` 后运行 `npm run lint`（规则见 `eslint.config.js`）；`test` 运行 `npm test`（单元测试不依赖 npm 包，所以不需要 install）
+- `end-to-end` 函数：用 [devops-test-server](https://github.com/zoulingang/devops-test-server) main 分支的 Dockerfile 启动后端（服务名 `api`，端口 8000），用本仓库的 Dockerfile 启动前端（服务名 `web`），再在 Playwright 官方镜像里运行 `npm run e2e`（用例在 `e2e/customers.spec.js`，配置在 `playwright.config.js`）。想测本地的后端代码，可以传 `--server=../devops-test-server`。函数没叫 `e2e`，是因为 Dagger 会把带数字的名字转成 `e-2-e` 这样的命令
+- `.github/workflows/ci.yml`：在 PR 和 push 到 main 时依次运行 `dagger call lint`、`dagger call test`、`dagger call end-to-end`
 
 本地运行需要先安装 [Dagger CLI](https://docs.dagger.io/install)（v0.21.11）和 Docker。
 
@@ -58,6 +60,7 @@ dagger call test   # 单元测试：npm test
 
 ```bash
 dagger call lint --npm-registry=https://registry.npmmirror.com
+dagger call end-to-end --npm-registry=https://registry.npmmirror.com
 ```
 
 Dagger 第一次加载模块时还要给 Python SDK 装依赖，这一步可以在 `.dagger/uv.toml` 里配置镜像源（该文件已被 git 忽略，只在本地生效）：
@@ -66,6 +69,16 @@ Dagger 第一次加载模块时还要给 Python SDK 装依赖，这一步可以�
 [[index]]
 url = "https://mirrors.aliyun.com/pypi/simple/"
 default = true
+```
+
+## 不用 Dagger 跑 E2E
+
+先按「本地运行」把后端（8000）和前端（5173）都启动，然后：
+
+```bash
+npm install
+npx playwright install chromium   # 第一次需要下载浏览器
+npm run e2e
 ```
 
 ## 代码检查
