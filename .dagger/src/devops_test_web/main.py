@@ -5,7 +5,7 @@ from dagger import DefaultPath, Doc, Ignore, dag, function, object_type
 
 SOURCE_IGNORE = [".git", ".dagger", "node_modules", "test-results", "playwright-report"]
 
-# 后端仓库：e2e 默认拉它 main 分支的代码，用它自己的 Dockerfile 构建并启动。
+# 后端仓库：end-to-end 默认拉它 main 分支的代码，用它自己的 Dockerfile 构建并启动。
 SERVER_REPO = "https://github.com/zoulingang/devops-test-server"
 
 # 与 package.json 里 @playwright/test 的版本保持一致，镜像里已装好浏览器。
@@ -64,7 +64,7 @@ class DevopsTestWeb:
         )
 
     @function
-    async def e2e(
+    async def end_to_end(
         self,
         source: Annotated[dagger.Directory, DefaultPath("/"), Ignore(SOURCE_IGNORE)],
         server: Annotated[
