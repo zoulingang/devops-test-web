@@ -39,6 +39,20 @@ npm start            # 等价于 python3 -m http.server 5173 --directory src
 npm test
 ```
 
+## CI（Dagger）
+
+CI 流程写在 Dagger 模块里，本地和 GitHub Actions 跑的是同一条命令：
+
+```bash
+dagger call test
+```
+
+- `dagger.json`：模块声明（名字、Dagger 版本、用 Python SDK、代码在 `.dagger/`）
+- `.dagger/src/devops_test_web/main.py`：唯一的函数 `test`，把代码放进 `node:22-slim` 容器运行 `npm test`（没有 npm 依赖，所以不需要 install）
+- `.github/workflows/ci.yml`：在 PR 和 push 到 main 时运行 `dagger call test`
+
+本地运行需要先安装 [Dagger CLI](https://docs.dagger.io/install)（v0.21.11）和 Docker。
+
 ## Docker
 
 ```bash
