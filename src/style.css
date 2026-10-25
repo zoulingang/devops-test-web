@@ -1,0 +1,13 @@
+body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+h1 { font-size: 1.5rem; }
+form { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
+form textarea { grid-column: 1 / -1; min-height: 3rem; }
+input, textarea, button { font: inherit; padding: 0.4rem 0.6rem; }
+.buttons { grid-column: 1 / -1; display: flex; gap: 0.5rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border-bottom: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+.actions { white-space: nowrap; }
+.danger { color: #b00020; }
+.empty { color: #888; text-align: center; }
+#message { min-height: 1.5rem; color: #1b5e20; }
+#message.error { color: #b00020; }
