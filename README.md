@@ -2,7 +2,7 @@
 
 极简 CRM 前端，用于学习 DevOps / CI/CD。后端在 [devops-test-server](https://github.com/zoulingang/devops-test-server)。
 
-- 纯 HTML + 原生 JavaScript，**无框架、无构建步骤、无 npm 依赖**
+- 纯 HTML + 原生 JavaScript，**无框架、无构建步骤、页面运行不依赖 npm 包**（eslint 只是开发依赖）
 - 功能：客户列表、新增、编辑、删除
 - 无鉴权
 
@@ -44,14 +44,22 @@ npm test
 CI 流程写在 Dagger 模块里，本地和 GitHub Actions 跑的是同一条命令：
 
 ```bash
-dagger call test
+dagger call lint   # 静态检查：eslint
+dagger call test   # 单元测试：npm test
 ```
 
 - `dagger.json`：模块声明（名字、Dagger 版本、用 Python SDK、代码在 `.dagger/`）
-- `.dagger/src/devops_test_web/main.py`：唯一的函数 `test`，把代码放进 `node:22-slim` 容器运行 `npm test`（没有 npm 依赖，所以不需要 install）
-- `.github/workflows/ci.yml`：在 PR 和 push 到 main 时运行 `dagger call test`
+- `.dagger/src/devops_test_web/main.py`：两个函数。`lint` 在 `node:22-slim` 容器里 `npm ci` 后运行 `npm run lint`（规则见 `eslint.config.js`）；`test` 运行 `npm test`（单元测试不依赖 npm 包，所以不需要 install）
+- `.github/workflows/ci.yml`：在 PR 和 push 到 main 时先运行 `dagger call lint`，再运行 `dagger call test`
 
 本地运行需要先安装 [Dagger CLI](https://docs.dagger.io/install)（v0.21.11）和 Docker。
+
+## 代码检查
+
+```bash
+npm install
+npm run lint
+```
 
 ## Docker
 
