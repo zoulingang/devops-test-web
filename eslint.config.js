@@ -12,7 +12,7 @@ module.exports = [
     },
   },
   {
-    files: ["tests/**/*.js", "eslint.config.js"],
+    files: ["tests/**/*.js", "e2e/**/*.js", "eslint.config.js", "playwright.config.js"],
     languageOptions: {
       sourceType: "commonjs",
       globals: globals.node,

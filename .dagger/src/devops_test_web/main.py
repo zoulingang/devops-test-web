@@ -3,7 +3,13 @@ from typing import Annotated
 import dagger
 from dagger import DefaultPath, Doc, Ignore, dag, function, object_type
 
-SOURCE_IGNORE = [".git", ".dagger", "node_modules"]
+SOURCE_IGNORE = [".git", ".dagger", "node_modules", "test-results", "playwright-report"]
+
+# 后端仓库：e2e 默认拉它 main 分支的代码，用它自己的 Dockerfile 构建并启动。
+SERVER_REPO = "https://github.com/zoulingang/devops-test-server"
+
+# 与 package.json 里 @playwright/test 的版本保持一致，镜像里已装好浏览器。
+PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.64.0-noble"
 
 # 可选参数：国内网络下本地运行时，用它把 npm 指向国内镜像源。默认为空，即使用官方 registry。
 NpmRegistry = Annotated[
@@ -54,5 +60,43 @@ class DevopsTestWeb:
             .with_directory("/app", source)
             .with_workdir("/app")
             .with_exec(["npm", "test"])
+            .stdout()
+        )
+
+    @function
+    async def e2e(
+        self,
+        source: Annotated[dagger.Directory, DefaultPath("/"), Ignore(SOURCE_IGNORE)],
+        server: Annotated[
+            dagger.Directory | None,
+            Doc("后端代码目录，例如 ../devops-test-server ；不传则用 devops-test-server 仓库的 main 分支"),
+        ] = None,
+        npm_registry: NpmRegistry = "",
+    ) -> str:
+        """端到端测试：同时启动后端和前端，再用 Playwright 在浏览器里新增、编辑、删除一个客户。
+
+        后端（api:8000）和前端（web:80）都是 Dagger service，用各自仓库的 Dockerfile 构建；
+        测试容器通过服务名访问它们，浏览器发出的 API 请求也直接打到 http://api:8000 。
+        """
+        if server is None:
+            server = dag.git(SERVER_REPO).branch("main").tree()
+
+        api = server.docker_build().with_exposed_port(8000).as_service()
+        web = source.docker_build().with_exposed_port(80).as_service()
+
+        ctr = dag.container().from_(PLAYWRIGHT_IMAGE)
+        if npm_registry:
+            ctr = ctr.with_env_variable("npm_config_registry", npm_registry)
+        return await (
+            ctr.with_workdir("/app")
+            .with_file("/app/package.json", source.file("package.json"))
+            .with_file("/app/package-lock.json", source.file("package-lock.json"))
+            .with_exec(["npm", "ci"])
+            .with_directory("/app", source)
+            .with_service_binding("api", api)
+            .with_service_binding("web", web)
+            .with_env_variable("API_URL", "http://api:8000")
+            .with_env_variable("BASE_URL", "http://web")
+            .with_exec(["npm", "run", "e2e"])
             .stdout()
         )

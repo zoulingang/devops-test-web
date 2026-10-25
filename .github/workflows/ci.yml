@@ -16,3 +16,5 @@ jobs:
         run: dagger call lint
       - name: dagger call test
         run: dagger call test
+      - name: dagger call e2e
+        run: dagger call e2e
