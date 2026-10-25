@@ -1,3 +1,5 @@
+/* global FIELDS, formToCustomer, validateCustomer, escapeHtml -- defined in lib.js, loaded before this script */
+
 const API = `${window.CRM_API_BASE}/api/customers`;
 
 const form = document.getElementById("customer-form");
