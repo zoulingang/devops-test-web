@@ -27,12 +27,17 @@ class DevopsTestWeb:
         source: Annotated[dagger.Directory, DefaultPath("/"), Ignore(SOURCE_IGNORE)],
         npm_registry: NpmRegistry = "",
     ) -> str:
-        """静态检查：npm ci 安装 eslint，再运行 npm run lint（规则在 eslint.config.js）。"""
+        """静态检查：npm ci 安装 eslint，再运行 npm run lint（规则在 eslint.config.js）。
+
+        先只拷 package.json 和 lock 文件并安装，再拷其余代码：只改代码、不改依赖时，npm ci 能命中缓存。
+        """
         return await (
             self.node(npm_registry)
-            .with_directory("/app", source)
             .with_workdir("/app")
+            .with_file("/app/package.json", source.file("package.json"))
+            .with_file("/app/package-lock.json", source.file("package-lock.json"))
             .with_exec(["npm", "ci"])
+            .with_directory("/app", source)
             .with_exec(["npm", "run", "lint"])
             .stdout()
         )
