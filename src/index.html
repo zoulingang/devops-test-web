@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple CRM</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>客户管理</h1>
+
+  <form id="customer-form">
+    <input type="hidden" name="id">
+    <input name="name" placeholder="姓名 *" required>
+    <input name="email" type="email" placeholder="邮箱">
+    <input name="phone" placeholder="电话">
+    <input name="company" placeholder="公司">
+    <textarea name="notes" placeholder="备注"></textarea>
+    <div class="buttons">
+      <button type="submit" id="submit-btn">新增客户</button>
+      <button type="button" id="cancel-btn" hidden>取消编辑</button>
+    </div>
+  </form>
+
+  <p id="message"></p>
+
+  <table>
+    <thead>
+      <tr><th>姓名</th><th>邮箱</th><th>电话</th><th>公司</th><th>备注</th><th></th></tr>
+    </thead>
+    <tbody id="customer-rows"></tbody>
+  </table>
+
+  <script src="config.js"></script>
+  <script src="lib.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
