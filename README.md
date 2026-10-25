@@ -54,6 +54,20 @@ dagger call test   # 单元测试：npm test
 
 本地运行需要先安装 [Dagger CLI](https://docs.dagger.io/install)（v0.21.11）和 Docker。
 
+在国内网络下访问 npm 很慢，可以给 `lint` 传一个 npm 镜像源（不传就用官方 registry，GitHub Actions 上就是不传）：
+
+```bash
+dagger call lint --npm-registry=https://registry.npmmirror.com
+```
+
+Dagger 第一次加载模块时还要给 Python SDK 装依赖，这一步可以在 `.dagger/uv.toml` 里配置镜像源（该文件已被 git 忽略，只在本地生效）：
+
+```toml
+[[index]]
+url = "https://mirrors.aliyun.com/pypi/simple/"
+default = true
+```
+
 ## 代码检查
 
 ```bash
