@@ -1,20 +1,23 @@
 :root {
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
-  --primary-soft: #eff6ff;
   --danger: #b91c1c;
   --danger-soft: #fef2f2;
   --success: #15803d;
   --success-soft: #f0fdf4;
   --text: #1f2937;
+  --gray-dark: #374151;
+  --gray-soft: #f3f4f6;
+  --gray-hover: #e5e7eb;
+  --gray-border: #9ca3af;
   --muted: #6b7280;
   --border: #d1d5db;
   --surface: #ffffff;
-  --page: #f3f4f6;
+  --page: #f9fafb;
 }
 
 body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; color: var(--text); background: var(--page); }
-h1 { font-size: 1.5rem; color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 0.5rem; }
+h1 { font-size: 1.5rem; color: var(--gray-dark); border-bottom: 3px solid var(--primary); padding-bottom: 0.5rem; }
 
 form { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
 form textarea { grid-column: 1 / -1; min-height: 3rem; }
@@ -23,18 +26,18 @@ input, textarea { color: var(--text); background: var(--surface); border: 1px so
 input:focus, textarea:focus { outline: 2px solid var(--primary); outline-offset: -1px; border-color: var(--primary); }
 .buttons { grid-column: 1 / -1; display: flex; gap: 0.5rem; }
 
-button { color: var(--primary); background: var(--surface); border: 1px solid var(--primary); border-radius: 6px; cursor: pointer; }
-button:hover { background: var(--primary-soft); }
-#submit-btn { color: #fff; background: var(--primary); }
+button { color: var(--gray-dark); background: var(--surface); border: 1px solid var(--gray-border); border-radius: 6px; cursor: pointer; }
+button:hover { background: var(--gray-hover); }
+#submit-btn { color: #fff; background: var(--primary); border-color: var(--primary); }
 #submit-btn:hover { background: var(--primary-hover); }
 button.danger { color: var(--danger); border-color: var(--danger); }
 button.danger:hover { background: var(--danger-soft); }
 
 table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-th { color: #fff; background: var(--primary); }
+th { color: #fff; background: var(--gray-dark); }
 th, td { border-bottom: 1px solid var(--border); padding: 0.5rem; text-align: left; }
-tbody tr:nth-child(even) { background: #f9fafb; }
-tbody tr:hover { background: var(--primary-soft); }
+tbody tr:nth-child(even) { background: var(--gray-soft); }
+tbody tr:hover { background: var(--gray-hover); }
 .actions { white-space: nowrap; }
 .empty { color: var(--muted); text-align: center; font-style: italic; }
 
