@@ -46,13 +46,17 @@ CI 流程写在 Dagger 模块里，本地和 GitHub Actions 跑的是同一条�
 ```bash
 dagger call lint        # 静态检查：eslint
 dagger call test        # 单元测试：npm test
-dagger call end-to-end  # 端到端（E2E）测试：启动后端 + 前端，用 Playwright 在浏览器里增、改、删一个客户
+dagger call end-to-end  # 端到端（E2E）测试：启动后端 + 前端，用 Playwright 在浏览器里增、改、删客户
+
+# 跑 E2E 并把 HTML 报告（每个用例的截图 + 通过/失败结果）导出到本地 ./playwright-report
+dagger call end-to-end-report export --path=./playwright-report
+open playwright-report/index.html   # macOS；Linux 用 xdg-open
 ```
 
 - `dagger.json`：模块声明（名字、Dagger 版本、用 Python SDK、代码在 `.dagger/`）
-- `.dagger/src/devops_test_web/main.py`：三个函数。`lint` 在 `node:22-slim` 容器里 `npm ci` 后运行 `npm run lint`（规则见 `eslint.config.js`）；`test` 运行 `npm test`（单元测试不依赖 npm 包，所以不需要 install）
-- `end-to-end` 函数：用 [devops-test-server](https://github.com/zoulingang/devops-test-server) main 分支的 Dockerfile 启动后端（服务名 `api`，端口 8000），用本仓库的 Dockerfile 启动前端（服务名 `web`），再在 Playwright 官方镜像里运行 `npm run e2e`（用例在 `e2e/customers.spec.js`，配置在 `playwright.config.js`）。想测本地的后端代码，可以传 `--server=../devops-test-server`。函数没叫 `e2e`，是因为 Dagger 会把带数字的名字转成 `e-2-e` 这样的命令
-- `.github/workflows/ci.yml`：在 PR 和 push 到 main 时依次运行 `dagger call lint`、`dagger call test`、`dagger call end-to-end`
+- `.dagger/src/devops_test_web/main.py`：四个函数。`lint` 在 `node:22-slim` 容器里 `npm ci` 后运行 `npm run lint`（规则见 `eslint.config.js`）；`test` 运行 `npm test`（单元测试不依赖 npm 包，所以不需要 install）
+- `end-to-end` 和 `end-to-end-report` 函数：用 [devops-test-server](https://github.com/zoulingang/devops-test-server) main 分支的 Dockerfile 启动后端（服务名 `api`，端口 8000），用本仓库的 Dockerfile 启动前端（服务名 `web`），再在 Playwright 官方镜像里运行 `npm run e2e`（三个用例：新增、编辑、删除客户，在 `e2e/customers.spec.js`；配置在 `playwright.config.js`，每个用例结束时都截图）。`end-to-end` 有用例失败就报错；`end-to-end-report` 不论成败都返回 HTML 报告目录。两者共用同一步测试，输入不变时 Dagger 命中缓存，测试只跑一次。想测本地的后端代码，可以传 `--server=../devops-test-server`。函数没叫 `e2e`，是因为 Dagger 会把带数字的名字转成 `e-2-e` 这样的命令
+- `.github/workflows/ci.yml`：在 PR 和 push 到 main 时运行三个并行的 job：`lint`、`test`、`end-to-end`，在 PR 页面上各自显示为一个检查。`end-to-end` job 先导出报告，再上传为 artifact `playwright-report`（测试失败也上传），最后用 `dagger call end-to-end` 判定成败。下载方式：打开 Actions 里对应的运行页面，在底部 Artifacts 区点 `playwright-report`，解压后打开 `index.html`
 
 本地运行需要先安装 [Dagger CLI](https://docs.dagger.io/install)（v0.21.11）和 Docker。
 
