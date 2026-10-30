@@ -4,10 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Simple CRM</title>
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem("crm-theme");
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch (_) {
+        document.documentElement.dataset.theme = "light";
+      }
+    }());
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>客户管理</h1>
+  <header class="page-header">
+    <div>
+      <p class="product-name">Super-CRM-DevOps</p>
+      <h1>客户管理</h1>
+    </div>
+    <fieldset class="theme-switch" id="theme-switch" aria-label="主题">
+      <legend>主题</legend>
+      <label>
+        <input type="radio" name="theme" value="light" checked>
+        <span>亮色模式</span>
+      </label>
+      <label>
+        <input type="radio" name="theme" value="dark">
+        <span>夜间模式</span>
+      </label>
+    </fieldset>
+  </header>
 
   <form id="customer-form">
     <input type="hidden" name="id">

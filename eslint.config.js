@@ -2,6 +2,9 @@ const js = require("@eslint/js");
 const globals = require("globals");
 
 module.exports = [
+  {
+    ignores: ["node_modules/**", "test-results/**", "playwright-report/**"],
+  },
   js.configs.recommended,
   {
     // Browser scripts loaded with <script> tags (see src/index.html), sharing one global scope.

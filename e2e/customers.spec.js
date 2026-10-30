@@ -63,3 +63,31 @@ test("删除客户", async ({ page, request }) => {
   await expect(page.locator("#message")).toHaveText("已删除");
   await expect(row).toHaveCount(0);
 });
+
+test("切换夜间模式并刷新保留", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("radio", { name: "夜间模式" }).check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("radio", { name: "夜间模式" })).toBeChecked();
+
+  await page.reload();
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("radio", { name: "夜间模式" })).toBeChecked();
+
+  await page.getByRole("radio", { name: "亮色模式" }).check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+});
+
+test("切换主题时保留正在填写的表单内容", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByPlaceholder("姓名 *").fill("夜间模式验收客户");
+  await page.getByPlaceholder("公司").fill("Acme");
+
+  await page.getByRole("radio", { name: "夜间模式" }).check();
+
+  await expect(page.getByPlaceholder("姓名 *")).toHaveValue("夜间模式验收客户");
+  await expect(page.getByPlaceholder("公司")).toHaveValue("Acme");
+});

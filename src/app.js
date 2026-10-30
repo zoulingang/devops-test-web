@@ -7,8 +7,57 @@ const tbody = document.getElementById("customer-rows");
 const message = document.getElementById("message");
 const submitBtn = document.getElementById("submit-btn");
 const cancelBtn = document.getElementById("cancel-btn");
+const themeSwitch = document.getElementById("theme-switch");
+const themeInputs = Array.from(document.querySelectorAll('input[name="theme"]'));
 
 let customers = [];
+
+const THEME_STORAGE_KEY = "crm-theme";
+const DEFAULT_THEME = "light";
+const VALID_THEMES = new Set(["light", "dark"]);
+
+function normalizeTheme(theme) {
+  return VALID_THEMES.has(theme) ? theme : DEFAULT_THEME;
+}
+
+function saveTheme(theme) {
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // Theme storage is best-effort; the CRM workflow should stay usable without it.
+  }
+}
+
+function applyTheme(theme, shouldPersist = true) {
+  const nextTheme = normalizeTheme(theme);
+  document.documentElement.dataset.theme = nextTheme;
+  for (const input of themeInputs) input.checked = input.value === nextTheme;
+  if (themeSwitch) themeSwitch.setAttribute("aria-label", `主题，当前为${nextTheme === "dark" ? "夜间模式" : "亮色模式"}`);
+  if (shouldPersist) saveTheme(nextTheme);
+}
+
+function loadStoredTheme() {
+  try {
+    return normalizeTheme(localStorage.getItem(THEME_STORAGE_KEY));
+  } catch {
+    return DEFAULT_THEME;
+  }
+}
+
+function initThemeSwitch() {
+  if (!window.CRM_ENABLE_THEME_SWITCH) {
+    applyTheme(DEFAULT_THEME, false);
+    if (themeSwitch) themeSwitch.hidden = true;
+    return;
+  }
+
+  applyTheme(loadStoredTheme(), false);
+  for (const input of themeInputs) {
+    input.addEventListener("change", () => {
+      if (input.checked) applyTheme(input.value);
+    });
+  }
+}
 
 function showMessage(text, isError = false) {
   message.textContent = text;
@@ -101,4 +150,5 @@ tbody.addEventListener("click", async (event) => {
   }
 });
 
+initThemeSwitch();
 load();
