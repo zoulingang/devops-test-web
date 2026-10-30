@@ -35,6 +35,38 @@ test("新增客户", async ({ page }) => {
   await expect(row).toContainText("Acme");
 });
 
+test("切换主题并保留浏览器偏好", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.getByRole("button", { name: "浅色" })).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByPlaceholder("姓名 *").fill("主题切换客户");
+  await page.getByRole("button", { name: "高对比" }).click();
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "high-contrast");
+  await expect(page.getByRole("button", { name: "高对比" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "高对比" })).toBeFocused();
+  await expect(page.getByPlaceholder("姓名 *")).toHaveValue("主题切换客户");
+
+  await page.getByRole("button", { name: "深色" }).click();
+  await page.reload();
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("button", { name: "深色" })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("无效主题偏好回退到浅色", async ({ page }) => {
+  await page.addInitScript(() => {
+    globalThis.localStorage.setItem("crm-theme", "unknown");
+  });
+
+  await page.goto("/");
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.getByRole("button", { name: "浅色" })).toHaveAttribute("aria-pressed", "true");
+});
+
 test("编辑客户", async ({ page, request }) => {
   const name = uniqueName();
   await createCustomer(request, { name, company: "Acme" });

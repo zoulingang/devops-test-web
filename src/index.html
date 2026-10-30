@@ -7,7 +7,14 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>客户管理</h1>
+  <header class="page-header">
+    <h1>客户管理</h1>
+    <div class="theme-switcher" role="group" aria-label="主题切换">
+      <button type="button" class="theme-option" data-theme-option="light" aria-pressed="true">浅色</button>
+      <button type="button" class="theme-option" data-theme-option="dark" aria-pressed="false">深色</button>
+      <button type="button" class="theme-option" data-theme-option="high-contrast" aria-pressed="false">高对比</button>
+    </div>
+  </header>
 
   <form id="customer-form">
     <input type="hidden" name="id">

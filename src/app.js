@@ -1,14 +1,40 @@
-/* global FIELDS, formToCustomer, validateCustomer, escapeHtml -- defined in lib.js, loaded before this script */
+/* global FIELDS, formToCustomer, validateCustomer, escapeHtml, normalizeTheme -- defined in lib.js, loaded before this script */
 
 const API = `${window.CRM_API_BASE}/api/customers`;
+const THEME_STORAGE_KEY = "crm-theme";
 
 const form = document.getElementById("customer-form");
 const tbody = document.getElementById("customer-rows");
 const message = document.getElementById("message");
 const submitBtn = document.getElementById("submit-btn");
 const cancelBtn = document.getElementById("cancel-btn");
+const themeOptions = document.querySelectorAll("[data-theme-option]");
 
 let customers = [];
+
+function readStoredTheme() {
+  try {
+    return normalizeTheme(window.localStorage.getItem(THEME_STORAGE_KEY));
+  } catch {
+    return normalizeTheme(null);
+  }
+}
+
+function saveTheme(theme) {
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // Theme persistence is best-effort; CRM operations must stay usable.
+  }
+}
+
+function applyTheme(theme) {
+  const nextTheme = normalizeTheme(theme);
+  document.documentElement.dataset.theme = nextTheme;
+  for (const option of themeOptions) {
+    option.setAttribute("aria-pressed", String(option.dataset.themeOption === nextTheme));
+  }
+}
 
 function showMessage(text, isError = false) {
   message.textContent = text;
@@ -40,12 +66,18 @@ function render() {
     </tr>`).join("");
 }
 
+function renderStatusRow(text, className) {
+  tbody.innerHTML = `<tr><td colspan="6" class="${className}">${escapeHtml(text)}</td></tr>`;
+}
+
 async function load() {
+  renderStatusRow("正在加载...", "loading");
   try {
     customers = await request(API);
     render();
   } catch (err) {
     showMessage(`无法连接后端 ${window.CRM_API_BASE}：${err.message}`, true);
+    renderStatusRow("客户列表加载失败", "error-state");
   }
 }
 
@@ -80,6 +112,14 @@ form.addEventListener("submit", async (event) => {
 
 cancelBtn.addEventListener("click", resetForm);
 
+for (const option of themeOptions) {
+  option.addEventListener("click", () => {
+    const theme = normalizeTheme(option.dataset.themeOption);
+    applyTheme(theme);
+    saveTheme(theme);
+  });
+}
+
 tbody.addEventListener("click", async (event) => {
   const editId = event.target.dataset.edit;
   const deleteId = event.target.dataset.delete;
@@ -101,4 +141,5 @@ tbody.addEventListener("click", async (event) => {
   }
 });
 
+applyTheme(readStoredTheme());
 load();
