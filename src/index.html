@@ -9,10 +9,13 @@
 <body>
   <header class="page-header">
     <h1>客户管理</h1>
-    <div class="theme-switcher" role="group" aria-label="主题切换">
-      <button type="button" class="theme-option" data-theme-option="light" aria-pressed="true">浅色</button>
-      <button type="button" class="theme-option" data-theme-option="dark" aria-pressed="false">深色</button>
-      <button type="button" class="theme-option" data-theme-option="high-contrast" aria-pressed="false">高对比</button>
+    <div class="theme-switcher" aria-label="主题切换">
+      <label for="theme-select">主题</label>
+      <select id="theme-select" name="theme">
+        <option value="light">浅色</option>
+        <option value="dark">深色</option>
+        <option value="high-contrast">高对比</option>
+      </select>
     </div>
   </header>
 

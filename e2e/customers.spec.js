@@ -39,21 +39,22 @@ test("切换主题并保留浏览器偏好", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(page.getByRole("button", { name: "浅色" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#theme-select")).toHaveValue("light");
 
   await page.getByPlaceholder("姓名 *").fill("主题切换客户");
-  await page.getByRole("button", { name: "高对比" }).click();
+  await page.locator("#theme-select").focus();
+  await page.locator("#theme-select").selectOption("high-contrast");
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "high-contrast");
-  await expect(page.getByRole("button", { name: "高对比" })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByRole("button", { name: "高对比" })).toBeFocused();
+  await expect(page.locator("#theme-select")).toHaveValue("high-contrast");
+  await expect(page.locator("#theme-select")).toBeFocused();
   await expect(page.getByPlaceholder("姓名 *")).toHaveValue("主题切换客户");
 
-  await page.getByRole("button", { name: "深色" }).click();
+  await page.locator("#theme-select").selectOption("dark");
   await page.reload();
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("button", { name: "深色" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#theme-select")).toHaveValue("dark");
 });
 
 test("无效主题偏好回退到浅色", async ({ page }) => {
@@ -64,7 +65,7 @@ test("无效主题偏好回退到浅色", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(page.getByRole("button", { name: "浅色" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#theme-select")).toHaveValue("light");
 });
 
 test("编辑客户", async ({ page, request }) => {

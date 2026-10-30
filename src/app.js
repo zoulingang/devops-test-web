@@ -8,7 +8,7 @@ const tbody = document.getElementById("customer-rows");
 const message = document.getElementById("message");
 const submitBtn = document.getElementById("submit-btn");
 const cancelBtn = document.getElementById("cancel-btn");
-const themeOptions = document.querySelectorAll("[data-theme-option]");
+const themeSelect = document.getElementById("theme-select");
 
 let customers = [];
 
@@ -31,9 +31,7 @@ function saveTheme(theme) {
 function applyTheme(theme) {
   const nextTheme = normalizeTheme(theme);
   document.documentElement.dataset.theme = nextTheme;
-  for (const option of themeOptions) {
-    option.setAttribute("aria-pressed", String(option.dataset.themeOption === nextTheme));
-  }
+  themeSelect.value = nextTheme;
 }
 
 function showMessage(text, isError = false) {
@@ -112,13 +110,11 @@ form.addEventListener("submit", async (event) => {
 
 cancelBtn.addEventListener("click", resetForm);
 
-for (const option of themeOptions) {
-  option.addEventListener("click", () => {
-    const theme = normalizeTheme(option.dataset.themeOption);
-    applyTheme(theme);
-    saveTheme(theme);
-  });
-}
+themeSelect.addEventListener("change", () => {
+  const theme = normalizeTheme(themeSelect.value);
+  applyTheme(theme);
+  saveTheme(theme);
+});
 
 tbody.addEventListener("click", async (event) => {
   const editId = event.target.dataset.edit;
