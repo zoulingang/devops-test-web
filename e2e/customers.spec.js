@@ -70,14 +70,17 @@ test("切换夜间模式并刷新保留", async ({ page }) => {
   await page.getByRole("radio", { name: "夜间模式" }).check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.getByRole("radio", { name: "夜间模式" })).toBeChecked();
+  await expect(page.locator("#theme-switch")).toHaveAttribute("aria-label", "主题，当前为夜间模式");
 
   await page.reload();
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.getByRole("radio", { name: "夜间模式" })).toBeChecked();
+  await expect(page.locator("#theme-switch")).toHaveAttribute("aria-label", "主题，当前为夜间模式");
 
   await page.getByRole("radio", { name: "亮色模式" }).check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.locator("#theme-switch")).toHaveAttribute("aria-label", "主题，当前为亮色模式");
 });
 
 test("切换主题时保留正在填写的表单内容", async ({ page }) => {
@@ -90,4 +93,28 @@ test("切换主题时保留正在填写的表单内容", async ({ page }) => {
 
   await expect(page.getByPlaceholder("姓名 *")).toHaveValue("夜间模式验收客户");
   await expect(page.getByPlaceholder("公司")).toHaveValue("Acme");
+});
+
+test("非法本地主题偏好降级为亮色模式", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("crm-theme", "midnight");
+  });
+
+  await page.goto("/");
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.getByRole("radio", { name: "亮色模式" })).toBeChecked();
+  await expect(page.locator("#theme-switch")).toHaveAttribute("aria-label", "主题，当前为亮色模式");
+});
+
+test("关闭主题能力时隐藏入口并保持亮色体验", async ({ page }) => {
+  await page.addInitScript(() => {
+    globalThis.CRM_ENABLE_THEME_SWITCH = false;
+    localStorage.setItem("crm-theme", "dark");
+  });
+
+  await page.goto("/");
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.locator("#theme-switch")).toBeHidden();
 });
