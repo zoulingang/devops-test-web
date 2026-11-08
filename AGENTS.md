@@ -54,9 +54,11 @@ dagger call end-to-end-report export --path=./playwright-report     # 导出带�
 ## CI 和 Dagger
 
 - `.github/workflows/ci.yml` 有三个并行 job：`lint`、`test`、`end-to-end`。`end-to-end` 先导出报告并上传为 artifact `playwright-report`（失败也上传），再用 `dagger call end-to-end` 判定成败。两次调用输入相同，靠 Dagger 缓存只跑一次测试。
+- 正在迁移到 Jenkins：根目录 `Jenkinsfile`（声明式流水线）跑同样的 Dagger 命令，`lint`、`test`、`end-to-end` 三个阶段并行，`end-to-end` 不论成败都用 `archiveArtifacts` 归档 `playwright-report/`。Seth 确认 Jenkins 跑通之前保留 `ci.yml`，两边改动要同步。
+- Jenkins agent 的前提写在 `Jenkinsfile` 开头的注释里：装有 Docker 且 Jenkins 用户能执行 `docker`，有 curl，能访问 dl.dagger.io 等外网。Dagger CLI 由流水线自己装到 `$WORKSPACE_TMP/bin`，不要装到工作区里（会混进 `dagger call` 的源码目录）。
 - Dagger 模块在 `.dagger/src/devops_test_web/main.py`。函数名不要带数字（Dagger CLI 会把 `e2e` 变成 `e-2-e`）。
 - 安装依赖的步骤放在拷贝源码之前，这样只改代码时能命中缓存。新增函数时保持这个顺序。
-- Dagger 版本 0.21.11 同时写在 `dagger.json` 和 `ci.yml` 里，升级时一起改。
+- Dagger 版本 0.21.11 同时写在 `dagger.json`、`ci.yml` 和 `Jenkinsfile` 里，升级时一起改。
 - `--npm-registry` 参数只是为国内网络准备的，CI 里不要传。
 
 ## 约定
