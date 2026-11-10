@@ -7,7 +7,17 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>客户管理</h1>
+  <header class="page-header">
+    <h1>客户管理</h1>
+    <div class="theme-switcher" aria-label="主题切换">
+      <label for="theme-select">主题</label>
+      <select id="theme-select" name="theme">
+        <option value="light">浅色</option>
+        <option value="dark">深色</option>
+        <option value="high-contrast">高对比</option>
+      </select>
+    </div>
+  </header>
 
   <form id="customer-form">
     <input type="hidden" name="id">

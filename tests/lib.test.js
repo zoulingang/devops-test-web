@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { formToCustomer, validateCustomer, escapeHtml } = require("../src/lib.js");
+const { DEFAULT_THEME, formToCustomer, validateCustomer, escapeHtml, normalizeTheme } = require("../src/lib.js");
 
 test("formToCustomer trims values and turns blanks into null", () => {
   assert.deepStrictEqual(
@@ -22,4 +22,12 @@ test("validateCustomer checks email format", () => {
 test("escapeHtml escapes markup", () => {
   assert.strictEqual(escapeHtml('<b>"x"</b>'), "&lt;b&gt;&quot;x&quot;&lt;/b&gt;");
   assert.strictEqual(escapeHtml(null), "");
+});
+
+test("normalizeTheme accepts known themes and falls back to light", () => {
+  assert.strictEqual(normalizeTheme("light"), "light");
+  assert.strictEqual(normalizeTheme("dark"), "dark");
+  assert.strictEqual(normalizeTheme("high-contrast"), "high-contrast");
+  assert.strictEqual(normalizeTheme("unknown"), DEFAULT_THEME);
+  assert.strictEqual(normalizeTheme(null), DEFAULT_THEME);
 });

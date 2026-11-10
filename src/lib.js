@@ -1,5 +1,7 @@
 // Pure helpers, shared by the browser app and the Node tests.
 const FIELDS = ["name", "email", "phone", "company", "notes"];
+const THEMES = ["light", "dark", "high-contrast"];
+const DEFAULT_THEME = "light";
 
 function formToCustomer(values) {
   const customer = {};
@@ -22,6 +24,10 @@ function escapeHtml(text) {
   })[c]);
 }
 
+function normalizeTheme(theme) {
+  return THEMES.includes(theme) ? theme : DEFAULT_THEME;
+}
+
 if (typeof module !== "undefined") {
-  module.exports = { FIELDS, formToCustomer, validateCustomer, escapeHtml };
+  module.exports = { FIELDS, THEMES, DEFAULT_THEME, formToCustomer, validateCustomer, escapeHtml, normalizeTheme };
 }

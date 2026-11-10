@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Dagger CLI
-        run: curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=/usr/local/bin DAGGER_VERSION=0.21.11 sudo -E sh
+        run: curl -fsSL https://dl.dagger.io/dagger/install.sh | sudo env BIN_DIR=/usr/local/bin DAGGER_VERSION=0.21.11 sh
       - name: dagger call lint
         run: dagger call lint
 
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Dagger CLI
-        run: curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=/usr/local/bin DAGGER_VERSION=0.21.11 sudo -E sh
+        run: curl -fsSL https://dl.dagger.io/dagger/install.sh | sudo env BIN_DIR=/usr/local/bin DAGGER_VERSION=0.21.11 sh
       - name: dagger call test
         run: dagger call test
 
@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Dagger CLI
-        run: curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=/usr/local/bin DAGGER_VERSION=0.21.11 sudo -E sh
+        run: curl -fsSL https://dl.dagger.io/dagger/install.sh | sudo env BIN_DIR=/usr/local/bin DAGGER_VERSION=0.21.11 sh
       # 先导出报告：测试失败时这一步也成功，保证报告和截图一定能拿到
       - name: dagger call end-to-end-report
         run: dagger call end-to-end-report export --path=playwright-report
